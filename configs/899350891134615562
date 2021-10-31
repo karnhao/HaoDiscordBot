@@ -1,0 +1,14 @@
+{
+    "Id": "899350891134615562",
+    "Settings": {
+        "DataUrl": null,
+        "Replaceable": true,
+        "Interval": {
+            "Enable": true,
+            "ChannelId": [
+                "902483825337184307"
+            ],
+            "AlertBefore": 15
+        }
+    }
+}

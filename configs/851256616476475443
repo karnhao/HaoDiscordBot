@@ -1,0 +1,14 @@
+{
+    "Id": "851256616476475443",
+    "Settings": {
+        "DataUrl": "https://raw.githubusercontent.com/karnhao/HaoWidget/main/subject_data/6-7/6-7.json",
+        "Replaceable": true,
+        "Interval": {
+            "Enable": true,
+            "ChannelId": [
+                "872713058118688769"
+            ],
+            "AlertBefore": 30
+        }
+    }
+}

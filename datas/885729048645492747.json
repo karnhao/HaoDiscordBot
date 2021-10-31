@@ -1,0 +1,16 @@
+{
+    "classId": "72607SRV",
+    "className": "มัธยมศึกษาปีที่ 6/7",
+    "nullSubject": {
+        "width": 0,
+        "startTime": 0,
+        "period": -1,
+        "name": "ไม่มีเรียน",
+        "id": null,
+        "roomId": null,
+        "teacher": null,
+        "classroom": null,
+        "meet": null
+    },
+    "subjectList": {}
+}
