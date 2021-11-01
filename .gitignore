@@ -1,0 +1,8 @@
+node_modules
+*.npmignore
+config.json
+.vs
+temp
+tempCodeRunnerFile.js
+configs
+datas
