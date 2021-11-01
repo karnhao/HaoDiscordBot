@@ -73,13 +73,13 @@ export async function manageData(folderPath = './datas', id, showMessage = false
         let data;
 
         try {
-            if (fs.existsSync(folderPath)) fs.mkdirSync(folderPath);
+            if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath);
             fs.accessSync(`${folderPath}/${id}.json`, fs.constants.F_OK);
             showMessage && console.log("Found save data.");
             data = loadJSONSync(`${folderPath}/${id}.json`);
             saveExists = true;
         } catch (e) {
-            showMessage && console.log("Can't find save data.");
+            showMessage && console.log("Can't find save data. " + e?.message ?? "");
         }
 
         if (!(saveExists && !Config.getAllowReplace())) {
