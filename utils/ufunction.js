@@ -86,6 +86,7 @@ export async function manageData(folderPath = './datas', id, showMessage = false
             //download
             try {
                 let url = serversConfig.get(id).config.Settings.DataUrl;
+                if (url == null) throw new TypeError('Downloading rejected due to null url');
                 showMessage && console.log("Downloading subject data from " + url);
                 if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath);
                 let lData = await loadData(url);
@@ -95,18 +96,18 @@ export async function manageData(folderPath = './datas', id, showMessage = false
                 showMessage && console.log(`subject data saved at ${folderPath}/${id}.json.`);
             } catch (e) {
                 downloadOK = false;
-                showMessage && console.warn("Save file failed : " + e);
+                showMessage && console.warn("Failed : " + e);
             }
         }
 
         if (data) {
             try {
                 if (showMessage) console.log('Storing data to memory...');
-                if (!haosj.getClass(id)) { haosj.addClassRaw(id, data, false); }
-                else { haosj.getClass(id).update(false, data); };
+                if (!haosj.has(id)) haosj.addClassRaw(id, data, false);
+                else haosj.getClass(id).update(false, data);
                 resolve(`${downloadOK ? '⭕เรียบร้อย' : ' ⚠คำเตือน : มีปัญหาขึ้นในข้อมูลใหม่จึงใช้ข้อมูลเก่าแทน'}`);
             } catch (e) {
-                reject("เกิดข้อผิดพลาดขึ้นระหว่างการอ่านไฟล์");
+                reject("เกิดข้อผิดพลาดขึ้นระหว่างการอ่านไฟล์ " + e);
             }
         } else {
             reject("ไม่สามารถโหลดข้อมูลได้ทุกกรณี :(");

@@ -4,7 +4,7 @@ import { client } from "../main.js";
 import { sendSubjectMessage, weekday } from "../utils/commandbase.js";
 import { Config } from "../utils/config.js";
 import fs from "fs";
-import { isFileExist, loadJSONSync } from "../utils/data.js";
+import { isFileExist, loadData, loadJSONSync } from "../utils/data.js";
 import { serversConfig } from "../utils/serversconfig.js";
 import { getdata } from "./commands.js";
 import { getDayPeriodString } from "../utils/ufunction.js";
@@ -16,7 +16,7 @@ const sdo = {
     },
     execute: {
         rejected: '🚫Rejected.',
-        ended: '🔚จบการทำงาน',
+        ended: '🛑จบการทำงาน',
         selection_menus: {
             placeholder: 'เลือกว่าจะตั้งค่าอะไร',
             send_content: 'เลือก',
@@ -75,7 +75,7 @@ const sdo = {
             options: [
                 { label: 'สร้างวิชา', value: 'h_create_subject', description: 'ระบุชื่อ รหัส ห้องเรียน ครู เวลา ฯลฯ ของวิชา', emoji: '⚙' },
                 { label: 'เลือกวิชา', value: 'h_select_subject', description: 'เลือกวิชาที่มีอยู่แล้ว', emoji: '⚙' },
-                { label: 'ยกเลิก', value: 'cancel', description: 'ยกเลิกการตั้งวิชาทั้งหมด', emoji: '🔚' }
+                { label: 'ยกเลิก', value: 'cancel', description: 'ยกเลิกการตั้งวิชาทั้งหมด', emoji: '🛑' }
             ]
         }
     },
@@ -115,8 +115,8 @@ const sdo = {
             send_content: 'เลือก',
             placeholder: 'เลือกวิชา',
             init_options: [
-                { label: 'ยกเลิก', value: 'cancel', description: 'ยกเลิกการตั้งวิชาทั้งหมด', emoji: '🔚' },
-                { label: 'กลับ', value: 'back', description: 'กลับไปเลือกการตั้งวิชา', emoji: '🔙' }
+                { label: 'ยกเลิก', value: 'cancel', description: 'ยกเลิกการตั้งวิชาทั้งหมด', emoji: '🛑' },
+                { label: 'กลับ', value: 'back', description: 'กลับไปเลือกการตั้งวิชา', emoji: '↩' }
             ]
         },
         cancel_message: 'ยกเลิก'
@@ -202,7 +202,24 @@ const sdo = {
             title: '✔ Well done',
             description: 'ตั้งค่าวิชาในวัน%s แล้ว' // %s = ชื่อวัน
         }
-    }
+    },
+    file: {
+        errors: {
+            no_file: 'ไม่พบไฟล์',
+            unreadable: 'เกิดข้อผิดพลาด : อ่านข้อมูลไม่ได้'
+        },
+        warns: {
+            question: 'วางทับข้อมูลเก่าหรือไม่',
+            yes_button: 'ดำเนินการต่อ',
+            no_button: 'ยกเลิก'
+        },
+        title: 'วิธีการตั้งค่าข้อมูลโดยใช้ไฟล์',
+        description: 'ส่งไฟล์ข้อมูลมาพร้อมเพิ่มความคิดเห็นว่า \'//setdata -f\' หรือถ้าอยากจะวางทับไฟล์เก่าทันทีก็ให้เติม -R ไป',
+        cancel_message: 'ยกเลิก',
+        loading: 'กำลังโหลดข้อมูล...',
+        done: '⭕เรียบร้อย'
+    },
+    old_data: 'ข้อมูลเก่า'
 };
 
 export const name = 'setdata';
@@ -230,6 +247,11 @@ export async function execute(message, args) {
     guild_setting.push(message.guildId);
 
     try {
+        if (args[0] == '-f') {
+            await readFile(message, args);
+            await message.channel.send({ content: sdo.file.done });
+            return;
+        }
         let menus = new discord.MessageSelectMenu()
             .setCustomId('h_menu')
             .setOptions(sdo.execute.selection_menus.options)
@@ -255,7 +277,8 @@ export async function execute(message, args) {
                 await secondary(message);
                 break;
             case 'file':
-
+                await file(message);
+                break;
             default: throw new Error(sdo.errors.selected_menu_error);
         }
     } catch (e) {
@@ -562,14 +585,14 @@ async function getSubjectDay(message, day, old_data) {
             embeds: [new discord.MessageEmbed()
                 .setTitle(tsdo.already.title)
                 .setDescription(tsdo.already.description)
-                .setColor(Config.getColor())],
-            files: [`datas/${message.guildId}.json`]
+                .setColor(Config.getColor())]
         });
         if (!await yesno_buttons(message,
             tsdo.already.question,
             120000,
             tsdo.already.yes_button,
             tsdo.already.no_button)) throw new Error(tsdo.already.cancel);
+        await message.channel.send({ content: sdo.old_data, files: [`datas/${message.guildId}.json`] });
     }
     let dayName = weekday[day];
     /**
@@ -643,12 +666,11 @@ async function primary(message) {
             embeds: [new discord.MessageEmbed()
                 .setTitle(tsdo.warns.title)
                 .setDescription(tsdo.warns.description)
-                .setColor(Config.getColor())],
-            files: [`datas/${message.guildId}.json`]
+                .setColor(Config.getColor())]
         });
         if (!await yesno_buttons(message, tsdo.warns.question, 120000,
             tsdo.warns.yes_button, tsdo.warns.no_button)) throw new Error('Cancel');
-
+        await message.channel.send({ content: sdo.old_data, files: [`datas/${message.guildId}.json`] });
     }
     while (true) {
         await message.channel.send({
@@ -778,5 +800,34 @@ async function secondary(message) {
  * @param {Message} message 
  */
 async function file(message) {
-    
+    const tsdo = sdo.file;
+    await message.channel.send({
+        embeds: [new discord.MessageEmbed()
+            .setColor(Config.getColor())
+            .setTitle(tsdo.title)
+            .setDescription(tsdo.description)]
+    });
+}
+
+/**
+ * @param {Message} message 
+ * @param {string[]} args 
+ */
+async function readFile(message, args) {
+    const tsdo = sdo.file;
+    if (!message.attachments.first().url) throw new Error(tsdo.errors.no_file);
+    if (!args.some((u) => u == '-R') && isFileExist(`datas/${message.guildId}.json`)) {
+        if (!await yesno_buttons(message, tsdo.warns.question, 300000,
+            tsdo.warns.yes_button, tsdo.warns.no_button)) throw new Error(tsdo.cancel_message);
+        await message.channel.send({ content: sdo.old_data, files: [`datas/${message.guildId}.json`] });
+    }
+    let fileUrl = message.attachments.first().url;
+    await message.channel.send({ content: tsdo.loading });
+    let data = await loadData(fileUrl);
+    if (!haosj.isReadable(data)) throw new Error(tsdo.errors.unreadable);
+    fs.writeFileSync(`./datas/${message.guildId}.json`, JSON.stringify(data, null, 4));
+    let sc = serversConfig.get(message.guildId);
+    sc.config.Settings.DataUrl == null; sc.save();
+    haosj.getClass(message.guildId).update(false, data);
+    sc.manageInterval(true);
 }
