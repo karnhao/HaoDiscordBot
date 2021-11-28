@@ -91,9 +91,9 @@ const sdo = {
             'undefined'],
         form: {
             name: 'ระบุชื่อวิชา',
-            name_example: '(เช่น 🧪เคมี)',
-            id: 'ระบุ id ของวิชา (ถ้าไม่มีให้ตอบ null)',
-            id_example: '(เช่น ว31101)',
+            name_example: '(จำเป็น)(ตอบเช่น 🎨ศิลปะ)',
+            id: 'ระบุ id ของวิชา',
+            id_example: '(ถ้าไม่มีให้ตอบ null)(เช่น ว31101)',
             room: 'ระบุห้องเรียนของวิชา (ถ้าไม่มีให้ตอบ null)',
             room_example: '(เช่น ห้องทดลองเคมีที่ 2)',
             time: 'ระบุระยะเวลาในคาบนี้ (หน่วยเป็นนาที ตอบเช่น 50)',
@@ -117,7 +117,13 @@ const sdo = {
             init_options: [
                 { label: 'ยกเลิก', value: 'cancel', description: 'ยกเลิกการตั้งวิชาทั้งหมด', emoji: '🛑' },
                 { label: 'กลับ', value: 'back', description: 'กลับไปเลือกการตั้งวิชา', emoji: '↩' }
-            ]
+            ],
+            added_subject: {
+                label: 'อื่นๆ',
+                description: 'เลือกวิชาที่คุณพึ่งใส่เข้ามาในแบบสอบถามนี้',
+                emoji: '⚙',
+                value: '@'
+            }
         },
         cancel_message: 'ยกเลิก'
     },
@@ -178,14 +184,14 @@ const sdo = {
             yes_button: 'ยืนยัน',
             no_button: 'ไม่'
         },
-        null_subject: {
-            title: 'ใกล้เสร็จแล้ว',
-            description: 'คำถามต่อไปจะถามวิชาว่าง ซึ่งจะเห็นวิชานี้ในคาบที่ 0 และคาบหลังสุดท้าย.',
-            summit_button_content: 'เข้าใจแล้วกด Ok ภายใน 5 นาที',
-            summit_button_label: 'Ok'
-        },
+        // null_subject: {
+        //     title: 'ใกล้เสร็จแล้ว',
+        //     description: 'คำถามต่อไปจะถามวิชาว่าง ซึ่งจะเห็นวิชานี้ในคาบที่ 0 และคาบหลังสุดท้าย.',
+        //     summit_button_content: 'เข้าใจแล้วกด Ok ภายใน 5 นาที',
+        //     summit_button_label: 'Ok'
+        // },
         done: {
-            title: '✔ Well done',
+            title: '⭕ Well done',
             description: 'ไปตั้งค่าวิชาของห้องเรียนต่อไปได้เลย'
         }
     },
@@ -199,8 +205,8 @@ const sdo = {
             content: 'เลือกวัน'
         },
         done: {
-            title: '✔ Well done',
-            description: 'ตั้งค่าวิชาในวัน%s แล้ว' // %s = ชื่อวัน
+            title: '⭕ Well done',
+            description: 'ตั้งค่าวิชาในวัน%sแล้ว' // %s = ชื่อวัน
         }
     },
     file: {
@@ -365,13 +371,13 @@ export async function summitButton(message, content,
 export async function form(message, question, filterfn = (content) => content, time = 120000) {
     while (true) {
         let value;
-        message.channel.send({ content: question });
+        await message.channel.send({ content: question });
         value = await message.channel.awaitMessages({ errors: ['time'], max: 1, time, filter });
         if (value.first().content.toLowerCase() == sdo.form.cancel_command) throw new Error(sdo.form.cancel_message);
         try {
             return filterfn(value.first().content);
         } catch (e) {
-            message.channel.send({ content: `${sdo.form.reform}${e.message ? ` : ${e.message}` : ''}` });
+            await message.channel.send({ content: `${sdo.form.reform}${e.message ? ` : ${e.message}` : ''}` });
         }
     }
 }
@@ -449,9 +455,9 @@ async function createSubject(message, period = undefined, day = undefined, time 
     if (force?.name === undefined) data.name = await form(message,
         `${tsdo.form.name}${getDayPeriodString(day, period)} ${tsdo.form.name_example}`, undefined, time);
     if (force?.id === undefined) data.id = await form(message,
-        `${tsdo.form.id}${getDayPeriodString(day, period)} ${tsdo.form.id_example}`, (content) => g(content), time);
+        `${tsdo.form.id}${getDayPeriodString(day, period)} ${tsdo.form.id_example}`, g, time);
     if (force?.room === undefined) data.room = await form(message,
-        `${tsdo.form.room}${getDayPeriodString(day, period)} ${tsdo.form.room_example}`, (content) => g(content), time);
+        `${tsdo.form.room}${getDayPeriodString(day, period)} ${tsdo.form.room_example}`, g, time);
     if (force?.time === undefined) data.time = await form(message,
         tsdo.form.time, (content) => {
             let number = Number.parseInt(content);
@@ -491,75 +497,52 @@ async function createSubject(message, period = undefined, day = undefined, time 
  * @param {ClassData} classData 
  * @param {number} time default is 120000
  * @param {SubjectLike} force
+ * @param {number} period
  */
 async function selectSubject(message, period, classData, addedSubject = [], time = 120000, force = {}) {
-    /**
-     * @return {discord.MessageSelectOptionData}
-     * @param {Subject} subject 
-     * @param {number} day 
-     */
-    let f = (subject, day) => {
-        let description = `วัน${weekday[day]} คาบที่ ${subject.getLocalePeriod()} ${subject.getLocaleTeacherName()}`;
-        let label = subject.getLocaleName();
-        let value = `${day}:${subject.getPeriod()}`;
-        /**
-         * @param {string} text 
-         */
-        let ff = (text) => {
-            return text.length >= 100 ? text.substring(0, 96) + '...' : text;
-        }
-        description = ff(description); label = ff(label);
-        return {
-            label, value, description, emoji: '⚙',
-        }
-    }
     const tsdo = sdo.select_subject;
-    /**
-     * @type {discord.MessageSelectOptionData[]}
-     */
     let options = JSON.parse(JSON.stringify(tsdo.selection_menus.init_options));
-    classData.get().map((t) => { return { day: t.getDay(), subjects: t.getSubjectList() } }).forEach((u) => {
-        u.subjects.forEach((s) => {
-            options.push(f(s, u.day));
+    options.push(...(() => {
+        let out = weekday.map((v, index) => {
+            return { label: `วัน${v}`, value: index.toString(), description: `เลือกวิชาในวัน${v}`, emoji: '⚙' }
         });
-    });
-    addedSubject?.forEach((s, index) => {
-        options.push({
-            label: s.getLocaleName(),
-            description: `${s.getLocaleId()} ${s.getTeacher() ? s.getLocaleTeacherName() : ``}`,
-            value: `@:${index}`,
-            emoji: '🆕'
+        out.push({
+            label: 'อื่นๆ',
+            description: 'เลือกวิชาที่คุณพึ่งใส่เข้ามาในแบบสอบถามนี้',
+            emoji: '⚙',
+            value: '@'
         });
-    });
-    let menus = new discord.MessageSelectMenu()
-        .setCustomId('h_select_subject')
-        .setPlaceholder(tsdo.selection_menus.placeholder)
-        .setMinValues(1).setMaxValues(1).setOptions(options);
-    let actionRow = new discord.MessageActionRow()
-        .addComponents([menus]);
-    let sended_message = await message.channel.send({ content: tsdo.selection_menus.send_content, components: [actionRow] });
+        return out;
+    })());
+    let menus = new discord.MessageSelectMenu().setOptions(options).setCustomId('h_select_subject_menus').setPlaceholder('เลือกวัน');
+    let actionRow = new MessageActionRow().addComponents([menus]);
+    let sended_message = await message.channel.send({ components: [actionRow], content: 'เลือกวันที่มีวิชาที่คุณจะคัดลอก' });
     let interaction;
     try {
-        interaction = await message.channel.awaitMessageComponent({ componentType: 'SELECT_MENU', time });
+        interaction = await message.channel.awaitMessageComponent({ componentType: 'SELECT_MENU', time, filter });
         if (interaction.customId != menus.customId) throw new Error(sdo.errors.custom_id_error);
     } finally {
         await sended_message.delete();
     }
     let value = interaction.values[0];
-    switch (interaction.values[0]) {
-        case options[0].value:
-            throw new Error(tsdo.cancel_message);
-        case options[1].value:
-            return null;
-        default: break;
-    }
-    let s;
-    if (value.startsWith('@')) {
-        s = addedSubject[Number.parseInt(value.split(':')[1])];
-    } else {
-        let num_value = value.split(':').map((s) => Number.parseInt(s));
-        s = classData.get(num_value[0]).getSubject(num_value[1]);
-    }
+    if (value == options[0].value) throw new Error(tsdo.cancel_message);
+    if (value == options[1].value) return null;
+    let s = await form(
+        message, `ระบุคาบที่ต้องการคัดลอกข้อมูลวิชาในวัน${(value == '@')
+            ? 'นี้' : weekday[Number.parseInt(value)]}`, (content) => {
+                if (sdo.create_subject.null_filter.includes(content.toLocaleLowerCase())) return null;
+                let select_period = Number.parseInt(content);
+                let subject;
+                if (value.startsWith('@')) {
+                    subject = addedSubject[select_period];
+                } else {
+                    subject = classData.get(Number.parseInt(value)).getSubject(select_period - 1);
+                }
+                if (subject == null) throw new Error('ไม่พบวิชา');
+                return subject;
+            }
+    );
+    if (s == null) return null;
     s.setPeriod(period);
     if (force?.classroom !== undefined) s.setClassroomUrl(force.classroom);
     if (force?.id !== undefined) s.setId(force.id);
@@ -580,7 +563,7 @@ async function selectSubject(message, period, classData, addedSubject = [], time
  */
 async function getSubjectDay(message, day, old_data) {
     const tsdo = sdo.get_subject_day;
-    if (`_${day}` in old_data.subjectList) {
+    if (old_data?.subjectList[`_${day}`] != null) {
         await message.channel.send({
             embeds: [new discord.MessageEmbed()
                 .setTitle(tsdo.already.title)
@@ -614,7 +597,10 @@ async function getSubjectDay(message, day, old_data) {
         if (number > 127) throw new Error(tsdo.errors.limit_period);
         return number;
     });
-    if (periodCount == 0) throw new Error(tsdo.form.period_0);
+    if (periodCount == 0) {
+        if (!await yesno_buttons(message, `⚠คำเตือน:วิชาทั้งหมดในวัน${weekday[day]}จะหายไปหมด จะดำเนินการต่อหรือไม่`, 300000, 'ดำเนินการต่อเลย', 'ไม่ๆ')) throw new Error('ยกเลิก');
+        return null;
+    }
     let startTime = await getTime(message, tsdo.form.start_time);
     setting_data.startTime = (startTime.hours * 60) + startTime.minutes;
     for (let i = 0; i < periodCount; i++) {
@@ -651,7 +637,7 @@ async function getSubjectDay(message, day, old_data) {
  */
 async function primary(message) {
     /**
-     * @typedef {{setName:string,setId:string,periodCount:number[],nullSubject:Subject}} T
+     * @typedef {{setName:string,setId:string,periodCount:number[],nullSubject:import("haosj").RawSubject}} T
      * @type {T}
      */
     let setting_data = {
@@ -694,19 +680,15 @@ async function primary(message) {
         if (await yesno_buttons(message, tsdo.confirm.question, undefined,
             tsdo.confirm.yes_button, tsdo.confirm.no_button)) break;
     }
-    await message.channel.send({
-        embeds: [new discord.MessageEmbed()
-            .setTitle(tsdo.null_subject.title)
-            .setDescription(tsdo.null_subject.description)
-            .setColor(Config.getColor())]
-    });
-    await summitButton(message, tsdo.null_subject.summit_button_content, tsdo.null_subject.summit_button_label, 300000);
-    while (true) {
-        setting_data.nullSubject = await getSubject(message, -1, undefined, undefined,
-            { classroom: null, id: null, meet: null, room: null, teacher: null, time: null });
-        await sendSubjectMessage(message.channel, setting_data.nullSubject, undefined, 'วิชาว่าง');
-        if (await yesno_buttons(message, tsdo.confirm.question, undefined,
-            tsdo.confirm.yes_button, tsdo.confirm.no_button)) break;
+    let subject = new Subject('❌ไม่มี');
+    setting_data.nullSubject = {
+        name: subject.getName(),
+        id: subject.getId(),
+        width: subject.getWidth(),
+        classroom: subject.getClassroomUrl(),
+        meet: subject.getMeetUrl(),
+        roomId: subject.getRoomId(),
+        teacher: subject.getTeacher()
     }
     let sc = serversConfig.get(message.guildId);
     sc.config.Settings.DataUrl = null; sc.save();
@@ -783,7 +765,7 @@ async function secondary(message) {
     c.update(false, hdata);
     sc.manageInterval(true);
     await getdata.execute(message);
-    await message.channel.send({
+    c.get(index).getSubjectList().length > 0 && await message.channel.send({
         embeds: [new discord.MessageEmbed().setColor(Config.getColor()).addFields(c.get(index).getSubjectList().map((s) => {
             return { name: s.getName(), value: `${s.getLocaleTime()}น.`, inline: true }
         }))]
@@ -828,6 +810,7 @@ async function readFile(message, args) {
     fs.writeFileSync(`./datas/${message.guildId}.json`, JSON.stringify(data, null, 4));
     let sc = serversConfig.get(message.guildId);
     sc.config.Settings.DataUrl == null; sc.save();
+    !haosj.has(message.guildId) && haosj.addClassRaw(message.guildId, false);
     haosj.getClass(message.guildId).update(false, data);
     sc.manageInterval(true);
 }

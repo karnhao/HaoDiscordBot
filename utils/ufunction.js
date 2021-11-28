@@ -8,7 +8,7 @@ import fs from "fs";
 import { loadJSONSync, loadData } from "./data.js";
 import open from "open";
 import { serversConfig } from "./serversconfig.js";
-import haosj from "haosj";
+import haosj, { Subject } from "haosj";
 import { Message } from 'discord.js';
 
 /**
@@ -217,4 +217,19 @@ export function getDayPeriodString(day, period) {
     // อย่าแตะ!
     return period != null || day != null
         ? `ใน${day != null ? `วัน${weekday[day]}${period != null ? ` ` : ``}` : ``}${period != null ? `คาบที่${period + 1}` : ``}` : ``;
+}
+
+/**
+ * 
+ * @param {import('haosj').RawSubject} rawSubject 
+ */
+export function getSubjectByRaw(rawSubject) {
+    let subject = new Subject(rawSubject.name);
+    if (rawSubject.classroom != null) subject.setClassroomUrl(rawSubject.classroom);
+    if (rawSubject.id != null) subject.setId(rawSubject.id);
+    if (rawSubject.meet != null) subject.setMeetUrl(rawSubject.meet);
+    if (rawSubject.roomId != null) subject.setRoomId(rawSubject.roomId);
+    if (rawSubject.teacher != null) subject.setTeacher(rawSubject.teacher);
+    if (rawSubject.width != null) subject.setWidth(rawSubject.width);
+    return subject;
 }

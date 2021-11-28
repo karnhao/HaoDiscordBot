@@ -1,5 +1,6 @@
 import { Message, MessageEmbed } from "discord.js";
 import { serversConfig } from "../utils/serversconfig.js";
+import { Config } from "../utils/config.js";
 
 export const name = 'getconfig';
 export const description = 'ขอข้อมูล config'
@@ -22,7 +23,7 @@ export async function execute(message, args) {
                     name: "สามารถโหลดข้อมูลทับข้อมูลเก่า⚙",
                     value: sc.config.Settings.Replaceable ? '⭕ใช่' : '❌ไม่ใช่'
                 }
-            )
+            ).setColor(Config.getColor())
         ]
     });
 }

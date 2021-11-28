@@ -38,7 +38,7 @@ export class Config {
      * @param {string} token token ของ Bot ตัวนั้น (ข้อมูลไม่ควรให้ใครเห็น).
      */
     static setToken(token) {
-        if (!token) return;
+        if (typeof token != 'string' || token == null) return;
         config.BotToken = token;
     }
     /**

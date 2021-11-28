@@ -12,7 +12,7 @@ export async function execute(message, args) {
     try {
         let classData = getClass(message.guildId);
         let subject = classData.currentSubjectDay.getSubject(getPariodByArg(null, classData.currentPariod));
-        if (!subject) { throw new Error("ไม่มีข้อมูลวิชา.") }
+        if (subject == null) { throw new Error("ไม่มีข้อมูลวิชา.") }
         await sendSubjectMessage(message.channel, subject, classData, "📚ข้อมูลวิชาต่อไป");
     } catch (e) {
         return await message.channel.send({ content: "❌" + e });
