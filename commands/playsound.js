@@ -1,4 +1,4 @@
-import { Message, VoiceChannel } from "discord.js";
+import { Message } from "discord.js";
 import { client } from "../main.js";
 import { createAudioPlayer, createAudioResource, joinVoiceChannel, AudioPlayerStatus } from "@discordjs/voice";
 
@@ -13,9 +13,11 @@ export const description = 'เล่นเสียง';
 export async function execute(message, args) {
     let wait
     try {
-        wait = await message.reply({ content: "กรุณารอ..." });
+        console.log("DEBUG : START EXECUTE PLAYSOUND.");
         await message.fetch();
-        const vc = message.member.voice.channel;
+        await message.delete();
+        let vc = message.member.voice.channel;
+        wait = await message.channel.send({ content: "กรุณารอ..." });
         if (!vc || !vc.isVoice()) throw new Error("ไม่พบห้องพูดคุย");
         let permission = vc.permissionsFor(client.user);
         if (!permission.has("CONNECT")) throw new Error("ไม่มีสิทธิในการเข้าห้องนั้น");
@@ -34,11 +36,11 @@ export async function execute(message, args) {
             connection.destroy();
         });
         player.on(AudioPlayerStatus.Playing, async () => {
-            await message.reply({ content: "กำลังเล่นเพลง " + message.attachments.first().name });
+            await message.channel.send({ content: "กำลังเล่นเพลง " + message.attachments.first().name });
         });
     } catch (e) {
         await message.channel.send({ content: "❌มีบางอย่างผิดพลาด " + e });
     } finally {
-        if (wait.deletable) wait.delete();
+        if (wait.deletable) await wait.delete();
     }
 }
