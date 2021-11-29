@@ -12,7 +12,6 @@ export const description = 'เล่นเสียง';
  */
 export async function execute(message, args) {
     try {
-        console.log(generateDependencyReport());
         const vc = message.guild.channels.cache.get(args[0]);
         if (!vc || !vc.isVoice()) throw new Error("ไม่พบห้องพูดคุย");
         let permission = vc.permissionsFor(client.user);
