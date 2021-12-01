@@ -3,7 +3,7 @@ import cs from 'console-stamp';
 cs(console);
 import discord, { Intents } from "discord.js";
 import { Config } from "./utils/config.js";
-import { gls, gs, gns, about, seturl, toggleinterval, intervals, help, wand, gas, start_server, getdata, getconfig, setdata } from "./commands/commands.js";
+import cms from "./commands/commands.js";
 import { loadJSONSync } from "./utils/data.js";
 import { serversConfig } from "./utils/serversconfig.js";
 import { CronJob } from "cron";
@@ -20,7 +20,6 @@ export const client = new discord.Client({
     ]
 });
 const configPath = './config.json';
-
 if (!fs.existsSync("temp")) {
     console.log("Create temp directory...");
     fs.mkdirSync("temp");
@@ -32,7 +31,7 @@ console.log("Creating commands...");
  */
 export const client_commands = new discord.Collection();
 console.log("Setting commands...");
-[gs, gns, gls, about, seturl, toggleinterval, intervals, help, wand, gas, start_server, getdata, getconfig, setdata].forEach((t) => {
+cms.forEach((t) => {
     client_commands.set(t.name, t);
 });
 
@@ -86,7 +85,7 @@ client.once('ready', async () => {
 
 client.on('messageCreate', async (message) => {
     try {
-        let a = await (
+        await (
             /**
              * @returns {Promise<discord.Message>}
              */
@@ -101,7 +100,7 @@ client.on('messageCreate', async (message) => {
         )();
         // after message(a) >>
     } catch (e) {
-        console.warn('มีบางอย่างผิดพลาดใน ' + message.guild.name + e.message ? ` : ${e.message}` : JSON.stringify(r));
+        console.warn('มีบางอย่างผิดพลาดใน ' + message.guild.name + e.message ? ` : ${e.message}` : JSON.stringify(e));
     }
 });
 

@@ -1,5 +1,6 @@
 import { Message } from "discord.js";
 import open from "open";
+import publicIp from "public-ip";
 import { Config } from "../utils/config.js";
 
 export const name = 'start-server';
@@ -29,7 +30,13 @@ export async function execute(message, args) {
             running = false;
             throw e;
         });
-        await message.channel.send({ content: 'Opening...' });
+        let ip;
+        try {
+            ip = await publicIp.v4();
+        } catch (e) {
+            ip = 'มีบางอย่างผิดพลาด ติดต่อเจ้าของเซิฟเพื่อขอ ip';
+        }
+        await message.channel.send({ content: `กำลังเปิดเซิฟเวอร์มานคราฟ, ip ในการเข้าเซิฟ : ${ip}:25565 ...` });
         cooldown = true;
         setTimeout(() => {
             cooldown = false;

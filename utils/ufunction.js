@@ -8,7 +8,7 @@ import fs from "fs";
 import { loadJSONSync, loadData } from "./data.js";
 import open from "open";
 import { serversConfig } from "./serversconfig.js";
-import haosj from "haosj";
+import haosj, { Subject } from "haosj";
 import { Message } from 'discord.js';
 
 /**
@@ -73,18 +73,20 @@ export async function manageData(folderPath = './datas', id, showMessage = false
         let data;
 
         try {
+            if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath);
             fs.accessSync(`${folderPath}/${id}.json`, fs.constants.F_OK);
             showMessage && console.log("Found save data.");
             data = loadJSONSync(`${folderPath}/${id}.json`);
             saveExists = true;
         } catch (e) {
-            showMessage && console.log("Can't find save data.");
+            showMessage && console.log("Can't find save data. " + e?.message ?? "");
         }
 
         if (!(saveExists && !Config.getAllowReplace())) {
             //download
             try {
                 let url = serversConfig.get(id).config.Settings.DataUrl;
+                if (url == null) throw new TypeError('Downloading rejected due to null url');
                 showMessage && console.log("Downloading subject data from " + url);
                 if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath);
                 let lData = await loadData(url);
@@ -94,18 +96,18 @@ export async function manageData(folderPath = './datas', id, showMessage = false
                 showMessage && console.log(`subject data saved at ${folderPath}/${id}.json.`);
             } catch (e) {
                 downloadOK = false;
-                showMessage && console.warn("Save file failed : " + e);
+                showMessage && console.warn("Failed : " + e);
             }
         }
 
         if (data) {
             try {
                 if (showMessage) console.log('Storing data to memory...');
-                if (!haosj.getClass(id)) { haosj.addClassRaw(id, data, false); }
-                else { haosj.getClass(id).update(false, data); };
+                if (!haosj.has(id)) haosj.addClassRaw(id, data, false);
+                else haosj.getClass(id).update(false, data);
                 resolve(`${downloadOK ? '⭕เรียบร้อย' : ' ⚠คำเตือน : มีปัญหาขึ้นในข้อมูลใหม่จึงใช้ข้อมูลเก่าแทน'}`);
             } catch (e) {
-                reject("เกิดข้อผิดพลาดขึ้นระหว่างการอ่านไฟล์");
+                reject("เกิดข้อผิดพลาดขึ้นระหว่างการอ่านไฟล์ " + e);
             }
         } else {
             reject("ไม่สามารถโหลดข้อมูลได้ทุกกรณี :(");
@@ -215,4 +217,19 @@ export function getDayPeriodString(day, period) {
     // อย่าแตะ!
     return period != null || day != null
         ? `ใน${day != null ? `วัน${weekday[day]}${period != null ? ` ` : ``}` : ``}${period != null ? `คาบที่${period + 1}` : ``}` : ``;
+}
+
+/**
+ * 
+ * @param {import('haosj').RawSubject} rawSubject 
+ */
+export function getSubjectByRaw(rawSubject) {
+    let subject = new Subject(rawSubject.name);
+    if (rawSubject.classroom != null) subject.setClassroomUrl(rawSubject.classroom);
+    if (rawSubject.id != null) subject.setId(rawSubject.id);
+    if (rawSubject.meet != null) subject.setMeetUrl(rawSubject.meet);
+    if (rawSubject.roomId != null) subject.setRoomId(rawSubject.roomId);
+    if (rawSubject.teacher != null) subject.setTeacher(rawSubject.teacher);
+    if (rawSubject.width != null) subject.setWidth(rawSubject.width);
+    return subject;
 }
