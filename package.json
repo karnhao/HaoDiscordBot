@@ -4,7 +4,7 @@
   "description": "This is discord bot.",
   "main": "main.js",
   "author": "สิทธิภัทท์ เทพสุธา",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@discordjs/opus": "^0.7.0",
     "@discordjs/voice": "^0.7.5",
