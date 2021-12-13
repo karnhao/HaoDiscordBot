@@ -25,6 +25,10 @@ if (!fs.existsSync("temp")) {
     console.log("Create temp directory...");
     fs.mkdirSync("temp");
 }
+if (!fs.existsSync("./configs")) {
+    console.log("Create configs directory...");
+    fs.mkdirSync("configs");
+}
 
 console.log("Creating commands...");
 /**
