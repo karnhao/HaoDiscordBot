@@ -1,38 +1,32 @@
----
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+# Bug report
 
----
+## **เกี่ยวกับข้อผิดพลาด**<br>
+(อธิบายเกี่ยวกับข้อผิดพลาด)
 
-**Describe the bug**
-A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## **วิธีทำให้เกิดข้อผิดพลาดอีกครั้ง**
+ขั้นตอนเป็นดังนี้:
+1. ไปที่ '...'
+2. กดที่ '....'
+4. เจอ error
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## **คาดหวัง**
+(อธิบายสิ่งที่ควรจะเป็น)
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## **รูปภาพ**
+(ถ้ามี)
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## อุปกรณ์
+**Desktop (กรุณาระบุให้ครบ):**
+ - OS: [เช่น iOS]
+ - Browser [เช่น chrome, safari]
+ - Version [เช่น 22]
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Smartphone (กรุณาระบุให้ครบ):**
+ - Device: [เช่น iPhone6]
+ - OS: [เช่น iOS8.1]
+ - Browser [เช่น stock browser, safari]
+ - Version [เช่น 22]
 
-**Additional context**
-Add any other context about the problem here.
+## **เพิ่มเติม**
+(เพิ่มเติมเกี่ยวกับปัญหานี้ ถ้ามี)
