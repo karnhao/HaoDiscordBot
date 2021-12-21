@@ -1,6 +1,6 @@
 {
   "name": "haodiscordbot",
-  "version": "1.7 (A016SE)",
+  "version": "1.8 (A018MR)",
   "description": "This is discord bot.",
   "main": "main.js",
   "author": "สิทธิภัทท์ เทพสุธา",
@@ -12,7 +12,7 @@
     "cron": "^1.8.2",
     "discord.js": "^13.1.0",
     "ffmpeg-static": "^4.4.0",
-    "haosj": "^1.2.2",
+    "haosj": "^1.2.5",
     "libsodium-wrappers": "^0.7.9",
     "node-fetch": "^2.6.1",
     "open": "^8.2.1",

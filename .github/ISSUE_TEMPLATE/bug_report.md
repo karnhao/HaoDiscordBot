@@ -25,17 +25,13 @@ assignees: 'karnhao'
 ## **รูปภาพ**
 (ถ้ามี)
 
-## อุปกรณ์
-**Desktop (กรุณาระบุให้ครบ):**
- - OS: [เช่น iOS]
- - Browser [เช่น chrome, safari]
- - Version [เช่น 22]
-
-**Smartphone (กรุณาระบุให้ครบ):**
- - Device: [เช่น iPhone6]
- - OS: [เช่น iOS8.1]
- - Browser [เช่น stock browser, safari]
- - Version [เช่น 22]
+## รายละเอียด (กรุณาระบุให้ครบ)
+ - Device:                          [เช่น MacBook Pro M1 Max 16" 2024 , Lenovo Thinkpad , Custom Built]
+ - OS:                              [เช่น Windows 11 Pro, MacOS 12.1 , Linux Ubuntu, RedstarOS 3]
+ - Program I use to opening bot:    [เช่น Terminal, CMD, Powershell, Windows Terminal]
+ - Discord Version:                 [เช่น Stable 108703 (af46e7a)]
+ - Node Version:                    [เช่น 17.2.0]
+ - Hao Discord bot Version:         [เช่น 1.7 (A017MR)]
 
 ## **เพิ่มเติม**
 (เพิ่มเติมเกี่ยวกับปัญหานี้ ถ้ามี)
