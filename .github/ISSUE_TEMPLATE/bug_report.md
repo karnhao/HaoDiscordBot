@@ -1,3 +1,12 @@
+---
+name: รายงานข้อผิดพลาด (Bug report)
+about: รายงานข้อผิดพลาดและลายละเอียดต่างๆ เพื่อช่วยเราพัฒนาโปรแกรมให้ดีขึ้น
+title: 'Bug report'
+labels: 'Create a bug report'
+assignees: 'karnhao'
+
+---
+
 # Bug report
 
 ## **เกี่ยวกับข้อผิดพลาด**<br>
