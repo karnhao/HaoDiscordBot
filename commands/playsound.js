@@ -35,9 +35,7 @@ export async function execute(message, args) {
         player.on(AudioPlayerStatus.Idle, () => {
             connection.destroy();
         });
-        player.on(AudioPlayerStatus.Playing, async () => {
-            await message.channel.send({ content: "กำลังเล่นเพลง " + message.attachments.first().name });
-        });
+        await message.channel.send({ content: "กำลังเล่นเพลง " + message.attachments.first().name });
     } catch (e) {
         await message.channel.send({ content: "❌มีบางอย่างผิดพลาด " + e });
     } finally {
