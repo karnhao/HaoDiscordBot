@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import { client } from "../main.js";
 import { createAudioPlayer, createAudioResource, joinVoiceChannel, AudioPlayerStatus } from "@discordjs/voice";
 
-export const name = 'playsound';
+export const name = 'ps';
 export const description = 'เล่นเสียง';
 
 /**

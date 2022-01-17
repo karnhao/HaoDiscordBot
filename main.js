@@ -100,6 +100,7 @@ client.on('messageCreate', async (message) => {
                 let args = message.content.slice(Config.getPrefix().length).split(' ');
                 let command = args.shift().toLowerCase();
                 if (!client_commands.has(command)) return message;
+                console.log(`${message.guild.name}/${message.channel.name} running command ${command} ${args}.`);
                 return (await client_commands.get(command).execute(message, args)) ?? message;
             }
         )();

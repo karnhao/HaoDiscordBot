@@ -4,8 +4,6 @@ import { Config } from "../utils/config.js";
 
 export const name = 'stop';
 export const description = 'stop Hao Discord BOT (DEV1.0)';
-var running = false
-var cooldown = false;
 /**
  * 
  * @param {Message} message 
