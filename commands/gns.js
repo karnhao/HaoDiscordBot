@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import { getClass, getPariodByArg, sendSubjectMessage } from "../utils/commandbase.js";
 
 export const name = 'gns';
-export const description = 'ขอวิชาถัดไป';
+export const description = 'แสดงวิชาถัดไป';
 /**
  * 
  * @param {Message} message 
