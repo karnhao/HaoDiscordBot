@@ -4,14 +4,12 @@ import fs from "fs";
 import { loadJSONSync } from "./data.js";
 import { randomString } from './ufunction.js';
 /**
- * @type {{BotToken:string,Prefix:string,Allow_replace:boolean,Auto_admin_meet:boolean,ColorTheme:string,SplashText:string[],Servers:string[],StatusText:string,ServerPassword:string}}
+ * @type {{BotToken:string,Prefix:string,Allow_replace:boolean,ColorTheme:string,SplashText:string[],Servers:string[],StatusText:string,ServerPassword:string}}
  */
 const default_config = {
     BotToken: "",
     Prefix: "//",
     Allow_replace: true,
-    // (Deprecated) Auto_admin_meet will no longer here in futher.
-    Auto_admin_meet: false,
     ColorTheme: "#009900",
     SplashText: [
         "เรียนเดี๋ยวนี้!",
@@ -97,23 +95,6 @@ export class Config {
 
     /**
      * 
-     * @param {Boolean} value 
-     */
-    static setAutoMeet(value) {
-        if (value == null) return;
-        config.Auto_admin_meet = value;
-    }
-
-    /**
-     * 
-     * @returns {Boolean}
-     */
-    static getAutoMeet() {
-        return config.Auto_admin_meet;
-    }
-
-    /**
-     * 
      * @param {string[]} st 
      */
     static setSplashText(st) {
@@ -167,7 +148,6 @@ export class Config {
         this.setPrefix(config.Prefix);
         this.setToken(config.BotToken);
         this.setColor(config.ColorTheme);
-        this.setAutoMeet(config.Auto_admin_meet);
         this.setSplashText(config.SplashText);
         this.setStatusText(config.StatusText);
         this.setServerPassword(config.ServerPassword)

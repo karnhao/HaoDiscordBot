@@ -54,9 +54,6 @@ export function updateAutoMessage(subject_data, channelsID, showMessage = false)
             channelsID.map((t) => client.channels.cache.get(t)).forEach((u) => {
                 sendSubjectMessage(u, subject, "🤖****ข้อความอัตโนมัติ****");
             });
-            if (Config.getAutoMeet() && subject.getMeetUrl()) {
-                open(subject.getMeetUrl());
-            }
         }).start();
     });
 }
