@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import { client } from "../main.js";
 import { createAudioPlayer, createAudioResource, joinVoiceChannel, AudioPlayerStatus } from "@discordjs/voice";
 
-export const name = 'playsound';
+export const name = 'ps';
 export const description = 'เล่นเสียง';
 
 /**
@@ -35,9 +35,7 @@ export async function execute(message, args) {
         player.on(AudioPlayerStatus.Idle, () => {
             connection.destroy();
         });
-        player.on(AudioPlayerStatus.Playing, async () => {
-            await message.channel.send({ content: "กำลังเล่นเพลง " + message.attachments.first().name });
-        });
+        await message.channel.send({ content: "กำลังเล่นเพลง " + message.attachments.first().name });
     } catch (e) {
         await message.channel.send({ content: "❌มีบางอย่างผิดพลาด " + e });
     } finally {
