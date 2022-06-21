@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import open from "open";
-import publicIp from "public-ip";
+import { publicIpv4 } from "public-ip";
 import { Config } from "../utils/config.js";
 
 export const name = 'start-server';
@@ -32,7 +32,7 @@ export async function execute(message, args) {
         });
         let ip;
         try {
-            ip = await publicIp.v4();
+            ip = await publicIpv4();
         } catch (e) {
             ip = 'มีบางอย่างผิดพลาด ติดต่อเจ้าของเซิฟเพื่อขอ ip';
         }
