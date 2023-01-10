@@ -16,7 +16,7 @@
     "ffmpeg-static": "^5.0.0",
     "haosj": "^1.2.5",
     "libsodium-wrappers": "^0.7.9",
-    "node-fetch": "^3.1.1",
+    "node-fetch": "^3.2.10",
     "open": "^8.2.1",
     "opusscript": "^0.0.8",
     "public-ip": "^6.0.0"
